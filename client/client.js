@@ -12,7 +12,7 @@ var points;
 var points_simplified;
 
 var draw_color = "black";
-var line_width = 20;
+var line_width = 5;
 
 /*******************************************************************************
 * initial setup
