@@ -1,3 +1,9 @@
+var s = io('/');
+
+function log(text) {
+  console.log(text);
+}
+
 var your_turn_to_draw = true;
 var canvas, ctx;
 var currently_drawing = false;
@@ -13,6 +19,63 @@ var points_simplified;
 
 var draw_color = "black";
 var line_width = 5;
+
+/*******************************************************************************
+* request handling
+*/
+function request(payload) {
+     s.emit("req", payload);
+}
+
+function join(username) {
+    state = global.STATES.INIT;
+    my_username = username;
+    s.emit("req", [global.EVENTS.JOIN, username]);
+    $('#overlay').addClass('hidden');
+    $('#overlay_join').addClass('hidden');
+}
+
+function quit() {
+    s.emit("req", [global.EVENTS.QUIT]);
+    $('#overlay_join').removeClass('hidden');
+    $('#overlay').removeClass('hidden');
+}
+
+/*******************************************************************************
+* message handling
+*/
+s.on('msg', function (data) {
+    log(data);
+});
+
+/*******************************************************************************
+* state change handling
+*/
+s.on('state', function (data) {
+    log('new game state: ' + data);
+    state = data[0];
+    switch(state) {
+        default: break;
+    }
+});
+
+s.on('disconnect', function (data) {
+    quit();
+    //alert('Lost connection to server :(');
+});
+
+/*******************************************************************************
+* event handling
+*/
+s.on('event', function (data) {
+log('player event: ' + data);
+    switch(data[0]) {
+        //case global.EVENTS.JOIN: addUser(data[1]); break;
+        //case global.EVENTS.NAME: my_username = data[1]; break;
+        //case global.EVENTS.QUIT: $("[user='" + data[1] + "']").remove(); break;
+        default: break;
+    }
+});
 
 /*******************************************************************************
 * initial setup
