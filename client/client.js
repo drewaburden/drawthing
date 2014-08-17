@@ -1,6 +1,8 @@
 var your_turn_to_draw = true;
 var canvas, ctx;
 var currently_drawing = false;
+var drawing_timeout_id;
+var drawing_upload_interval = 100; // in ms
 
 var x1 = 0;
 var x2 = 0;
@@ -10,7 +12,7 @@ var points;
 var points_simplified;
 
 var draw_color = "black";
-var line_width = 2;
+var line_width = 20;
 
 /*******************************************************************************
 * initial setup
@@ -18,6 +20,7 @@ var line_width = 2;
 function init() {
     canvas = document.getElementById('canvas_original');
     ctx = canvas.getContext("2d");
+    ctx.lineCap = 'round';
 
     canvas.addEventListener("mousemove", function (e) {
         trackLine('move', [e.clientX, e.clientY])
@@ -39,14 +42,18 @@ function init() {
 function drawReceivedLine() {
     canvas2 = document.getElementById('canvas_copy');
     ctx2 = canvas2.getContext("2d");
-    ctx2.beginPath();
-    ctx2.moveTo(points_simplified[0][0], points_simplified[0][1]);
-    for (var i = 1; i < points_simplified.length; i++) {
-        ctx2.lineTo(points_simplified[i][0], points_simplified[i][1]);
-    }
+    ctx2.lineCap = 'round';
     ctx2.strokeStyle = draw_color;
     ctx2.lineWidth = line_width;
-    ctx2.stroke();
+
+    for (var i = 0; i < points_simplified.length - 1; i++) {
+        ctx2.beginPath();
+        ctx2.moveTo(points_simplified[i][0], points_simplified[i][1]);
+        ctx2.lineTo(points_simplified[i+1][0], points_simplified[i+1][1]);
+        ctx2.stroke();
+        ctx2.closePath();
+    }
+    
 }
 
 /*******************************************************************************
@@ -66,10 +73,19 @@ function drawLine() {
 * simplifies a drawn line and sends it to the server
 */
 function uploadLine() {
-    points_simplified = simplify(points, 0.5, true);
-    console.log("Reduced complexity from " + points.length + " to " +
-        points_simplified.length);
+    points_simplified = simplify(points, 0.75, false);
+    //console.log("Reduced complexity from " + points.length + " to " +
+    //    points_simplified.length);
     drawReceivedLine();
+}
+
+/*******************************************************************************
+* called on interval to send parts of a line while the user is still drawing it
+*/
+function uploadPartialLine() {
+    uploadLine();
+    points = points.slice(points.length - 1);
+    drawing_timeout_id = setTimeout(uploadPartialLine, drawing_upload_interval);
 }
 
 /*******************************************************************************
@@ -85,9 +101,12 @@ function trackLine(evt, point) {
         points = [];
         points.push([x2, y2]);
         currently_drawing = true;
+        drawing_timeout_id = setTimeout(uploadPartialLine,
+            drawing_upload_interval);
     }
     else if (evt == 'stop' && currently_drawing) {
         currently_drawing = false;
+        clearTimeout(drawing_timeout_id);
         uploadLine();
     }
     else if (evt == 'move' && currently_drawing) {
