@@ -48,7 +48,7 @@ function init() {
     }, false);
     canvas.addEventListener("mouseup", function (e) {
         findxy('up', e);
-        points_new = simplify(points, 1, false);
+        points_new = simplify(points, 0.5, true);
         draw_copy();
     }, false);
     canvas.addEventListener("mouseout", function (e) {
