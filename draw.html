@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<title>draw test</title>
+<!-- this code partially Creative Commons via http://stackoverflow.com/a/8398189 -->
+<style>canvas { border: 2px solid black; margin-left: 50px; }</style>
+<script type="text/javascript" src="simplify.js"></script>
+<script type="text/javascript">
+
+var points;
+var points_new;
+
+var canvas, ctx, flag = false,
+    prevX = 0,
+    currX = 0,
+    prevY = 0,
+    currY = 0,
+    dot_flag = false;
+
+var x = "black",
+    y = 2;
+
+function draw_copy() {
+    canvas2 = document.getElementById('canvas_copy');
+    ctx2 = canvas2.getContext("2d");
+    ctx2.beginPath();
+    ctx2.moveTo(points_new[0][0], points_new[0][1]);
+    for (var i = 1; i < points_new.length; i++) {
+      ctx2.lineTo(points_new[i][0], points_new[i][1]);
+    }
+    console.log("Reduced complexity from " + points.length + " to " + points_new.length);
+    ctx2.strokeStyle = x;
+    ctx2.lineWidth = y;
+    ctx2.stroke();
+}
+
+function init() {
+    canvas = document.getElementById('canvas_original');
+    ctx = canvas.getContext("2d");
+    w = canvas.width;
+    h = canvas.height;
+
+    canvas.addEventListener("mousemove", function (e) {
+        findxy('move', e)
+    }, false);
+    canvas.addEventListener("mousedown", function (e) {
+        points = [];
+        findxy('down', e)
+    }, false);
+    canvas.addEventListener("mouseup", function (e) {
+        findxy('up', e);
+        points_new = simplify(points, 1, false);
+        draw_copy();
+    }, false);
+    canvas.addEventListener("mouseout", function (e) {
+        findxy('out', e)
+    }, false);
+}
+
+function draw() {
+    ctx.beginPath();
+    ctx.moveTo(prevX, prevY);
+    ctx.lineTo(currX, currY);
+    ctx.strokeStyle = x;
+    ctx.lineWidth = y;
+    ctx.stroke();
+    ctx.closePath();
+}
+
+function findxy(res, e) {
+    if (res == 'down') {
+        prevX = currX;
+        prevY = currY;
+        currX = e.clientX - canvas.offsetLeft;
+        currY = e.clientY - canvas.offsetTop;
+        points.push([currX, currY]);
+
+        flag = true;
+        dot_flag = true;
+        if (dot_flag) {
+            ctx.beginPath();
+            ctx.fillStyle = x;
+            ctx.fillRect(currX, currY, 2, 2);
+            ctx.closePath();
+            dot_flag = false;
+        }
+    }
+    if (res == 'up' || res == "out") {
+        flag = false;
+    }
+    if (res == 'move') {
+        if (flag) {
+            prevX = currX;
+            prevY = currY;
+            currX = e.clientX - canvas.offsetLeft;
+            currY = e.clientY - canvas.offsetTop;
+            points.push([currX, currY]);
+            draw();
+        }
+    }
+}
+</script>
+<body onload="init()">
+<canvas id="canvas_original" width="400" height="400"></canvas>
+<canvas id="canvas_copy" width="400" height="400"></canvas>
+</body>
+</html>
