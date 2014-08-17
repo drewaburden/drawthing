@@ -56,8 +56,15 @@ io.on('connection', function (socket) {
   log('INFO: ' + socket.handshake.address.address + ' connected');
   socket.join('login');
   socket.on('req', function (data) {
-    log("new request: " + data[0]);
+    if (data[0] != EVENTS.DRAW_LINE) {
+      log("new request: " + data[0]);
+    }
     switch (data[0]) {
+      case EVENTS.DRAW_LINE:
+        //socket.broadcast.emit('event', [EVENTS.DRAW_LINE, data[1]]);
+        io.sockets.emit('event', [EVENTS.DRAW_LINE, data[1]]);
+        //socket.broadcast.to('game').emit('message', 'nice game');
+        break;
       default: break;
     }
   });
