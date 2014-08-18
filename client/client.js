@@ -74,9 +74,6 @@ s.on('event', function (data) {
     log('player event: ' + data);
   }
   switch(data[0]) {
-    //case global.EVENTS.JOIN: addUser(data[1]); break;
-    //case global.EVENTS.NAME: my_username = data[1]; break;
-    //case global.EVENTS.QUIT: $("[user='" + data[1] + "']").remove(); break;
     case global.EVENTS.DRAW_LINE: drawReceivedLine(data[1]); break;
     default: break;
   }
@@ -92,16 +89,21 @@ function init() {
   ctx.lineCap = 'round';
 
   canvas.addEventListener("mousemove", function (e) {
-    trackLine('move', [e.clientX, e.clientY])
+    if (currently_drawing) trackLine('move', [e.clientX, e.clientY])
   }, false);
   canvas.addEventListener("mousedown", function (e) {
-    trackLine('start', [e.clientX, e.clientY])
+    if (e.button == 0) trackLine('start', [e.clientX, e.clientY])
+    else trackLine('stop');
   }, false);
   canvas.addEventListener("mouseout", function (e) {
     document.getElementById('cursor').className = 'hidden';
   }, false);
   canvas.addEventListener("mouseenter", function (e) {
     document.getElementById('cursor').className = '';
+  }, false);
+  canvas.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    return false;
   }, false);
 
   $(document).bind("mouseup mouseleave", function () {
