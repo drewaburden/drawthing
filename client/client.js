@@ -97,17 +97,16 @@ function init() {
   canvas.addEventListener("mousedown", function (e) {
     trackLine('start', [e.clientX, e.clientY])
   }, false);
-  canvas.addEventListener("mouseup", function (e) {
-    trackLine('stop');
-  }, false);
   canvas.addEventListener("mouseout", function (e) {
-    trackLine('stop');
     document.getElementById('cursor').className = 'hidden';
   }, false);
   canvas.addEventListener("mouseenter", function (e) {
     document.getElementById('cursor').className = '';
   }, false);
 
+  $(document).bind("mouseup mouseleave", function () {
+    trackLine('stop');
+  });
   document.addEventListener('mousemove', function (e) {
     document.getElementById('cursor').style.left = e.pageX - (line_width / 2) + "px";
     document.getElementById('cursor').style.top = e.pageY - (line_width / 2) + "px";
