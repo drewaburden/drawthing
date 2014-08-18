@@ -8,7 +8,9 @@ var your_turn_to_draw = true;
 var canvas, ctx;
 var currently_drawing = false;
 var drawing_timeout_id;
-var drawing_upload_interval = 100; // in ms
+var drawing_upload_interval = 50; // in ms
+var drawing_simplification_tolerance = 0.75;
+var drawing_highquality = false;
 var simple_click_offset = 0.01;
 
 var x1 = 0;
@@ -154,11 +156,8 @@ function uploadLine() {
   if (points.length == 1) {
     points.push([points[0][0], points[0][1] + simple_click_offset])
   }
-  request([global.EVENTS.DRAW_LINE, [simplify(points, 0.75, false),
+  request([global.EVENTS.DRAW_LINE, [simplify(points, drawing_simplification_tolerance, drawing_highquality),
     draw_color, line_width]]);
-  //console.log("Reduced complexity from " + points.length + " to " +
-  //  points_simplified.length);
-  //drawReceivedLine();
 }
 
 /*******************************************************************************
