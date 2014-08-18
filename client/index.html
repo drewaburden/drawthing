@@ -13,7 +13,12 @@
 <script type="text/javascript" src="client.js"></script>
 </head>
 <body onload="init()">
+<div id="draw_controls">
+Line Width <input type="range" id="line_width" min="1" max="100" value="5" oninput="updateLineStyle()">
+<div id="line_preview_container"><div id="line_preview"></div></div>
+</div>
+<div id="draw_area">
 <canvas id="canvas_original" width="600" height="600"></canvas>
-<!--<canvas id="canvas_copy" width="400" height="400"></canvas>-->
+</div>
 </body>
 </html>

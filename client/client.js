@@ -9,12 +9,13 @@ var canvas, ctx;
 var currently_drawing = false;
 var drawing_timeout_id;
 var drawing_upload_interval = 100; // in ms
+var simple_click_offset = 0.01;
 
 var x1 = 0;
 var x2 = 0;
 var y1 = 0;
 var y2 = 0;
-var points;
+var points = [];
 
 var draw_color = "black";
 var line_width = 5;
@@ -83,6 +84,7 @@ s.on('event', function (data) {
 * initial setup
 */
 function init() {
+  updateLineStyle();
   canvas = document.getElementById('canvas_original');
   ctx = canvas.getContext("2d");
   ctx.lineCap = 'round';
@@ -106,13 +108,14 @@ function init() {
 */
 function drawReceivedLine(data) {
   ctx.lineCap = 'round';
-  ctx.strokeStyle = draw_color;
-  ctx.lineWidth = line_width;
+  ctx.strokeStyle = data[1];
+  ctx.lineWidth = data[2];
 
-  for (var i = 0; i < data.length - 1; i++) {
+  var line_points = data[0];
+  for (var i = 0; i < line_points.length - 1; i++) {
     ctx.beginPath();
-    ctx.moveTo(data[i][0], data[i][1]);
-    ctx.lineTo(data[i+1][0], data[i+1][1]);
+    ctx.moveTo(line_points[i][0], line_points[i][1]);
+    ctx.lineTo(line_points[i+1][0], line_points[i+1][1]);
     ctx.stroke();
     ctx.closePath();
   }
@@ -124,10 +127,12 @@ function drawReceivedLine(data) {
 */
 function drawLine() {
   ctx.beginPath();
+  // handle simple clicks
+  if (points.length == 1) {
+    y2 += simple_click_offset;
+  }
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
-  ctx.strokeStyle = draw_color;
-  ctx.lineWidth = line_width;
   ctx.stroke();
   ctx.closePath();
 }
@@ -136,7 +141,12 @@ function drawLine() {
 * simplifies a drawn line and sends it to the server
 */
 function uploadLine() {
-  request([global.EVENTS.DRAW_LINE, simplify(points, 0.75, false)]);
+  // handle simple clicks
+  if (points.length == 1) {
+    points.push([points[0][0], points[0][1] + simple_click_offset])
+  }
+  request([global.EVENTS.DRAW_LINE, [simplify(points, 0.75, false),
+    draw_color, line_width]]);
   //console.log("Reduced complexity from " + points.length + " to " +
   //  points_simplified.length);
   //drawReceivedLine();
@@ -161,7 +171,10 @@ function trackLine(evt, point) {
   else if (evt == 'start') {
     x2 = point[0] - canvas.offsetLeft;
     y2 = point[1] - canvas.offsetTop;
-    points = [];
+    x1 = x2;
+    y1 = y2;
+    ctx.strokeStyle = draw_color;
+    ctx.lineWidth = line_width;
     points.push([x2, y2]);
     currently_drawing = true;
     drawing_timeout_id = setTimeout(uploadPartialLine,
@@ -170,7 +183,12 @@ function trackLine(evt, point) {
   else if (evt == 'stop' && currently_drawing) {
     currently_drawing = false;
     clearTimeout(drawing_timeout_id);
+    // handle simple clicks
+    if (points.length == 1) {
+      drawLine();
+    }
     uploadLine();
+    points = [];
   }
   else if (evt == 'move' && currently_drawing) {
     x1 = x2;
@@ -180,4 +198,17 @@ function trackLine(evt, point) {
     points.push([x2, y2]);
     drawLine();
   }
+}
+
+/*******************************************************************************
+* updates draw color or width
+*/
+function updateLineStyle() {
+  line_width = document.getElementById('line_width').value;
+  var preview = document.getElementById('line_preview');
+  preview.style.width = (parseInt(line_width) + 1) + "px";
+  preview.style.height = (parseInt(line_width) + 1) + "px";
+  preview.style.marginLeft = (50 - (line_width / 2)) + "px";
+  preview.style.marginTop = (25 - (line_width / 2)) + "px";
+  //alert(preview.style.width);
 }
