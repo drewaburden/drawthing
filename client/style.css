@@ -11,11 +11,17 @@ canvas { border: 2px solid black; cursor: default; }
 
 #draw_controls { width: 690px; height: 50px; border: 2px solid #000;
   padding-left: 10px; font-weight: bold; }
-#draw_controls > * { vertical-align: middle; }
-#line_width { width: 200px; }
-#line_preview_container { width: 101px; height: 50px; overflow: hidden;
-  display: inline-block; border-right: 2px solid #000; }
-/* width and height of following are +1 pixel to better match what's drawn */
-#line_preview { background: #000; border-radius: 50%; }
 
-#draw_area { margin-top: 10px; }
+#line_width_container { height: 100%; border-right: 2px solid #000;
+  width: 400px; float: left; }
+#line_width_container > * { vertical-align: middle; }
+#line_width { width: 200px; }
+#line_preview_container { width: 102px; height: 100%; overflow: hidden;
+  display: inline-block; }
+#line_preview { background: #000; border-radius: 50%;
+  border: 1px solid #ccc; }
+
+#color_container { height: 100%; width: 288px; float: left; }
+.color { width: 24px; height: 50%; float: left; }
+
+#draw_area { clear: both; margin-top: 10px; }

@@ -17,7 +17,7 @@ var y1 = 0;
 var y2 = 0;
 var points = [];
 
-var draw_color = "black";
+var draw_color = "#000000";
 var line_width = 5;
 
 /*******************************************************************************
@@ -84,7 +84,7 @@ s.on('event', function (data) {
 * initial setup
 */
 function init() {
-  updateLineStyle();
+  updateLineWidth();
   canvas = document.getElementById('canvas_original');
   ctx = canvas.getContext("2d");
   ctx.lineCap = 'round';
@@ -203,12 +203,17 @@ function trackLine(evt, point) {
 /*******************************************************************************
 * updates draw color or width
 */
-function updateLineStyle() {
+function updateLineWidth() {
   line_width = document.getElementById('line_width').value;
   var preview = document.getElementById('line_preview');
-  preview.style.width = (parseInt(line_width) + 1) + "px";
-  preview.style.height = (parseInt(line_width) + 1) + "px";
+  preview.style.width = line_width + "px";
+  preview.style.height = line_width + "px";
   preview.style.marginLeft = (50 - (line_width / 2)) + "px";
   preview.style.marginTop = (25 - (line_width / 2)) + "px";
-  //alert(preview.style.width);
+}
+
+function updateLineColor(color) {
+  draw_color = color;
+  var preview = document.getElementById('line_preview');
+  preview.style.backgroundColor = color;
 }
