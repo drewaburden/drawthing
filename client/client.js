@@ -100,7 +100,16 @@ function init() {
   }, false);
   canvas.addEventListener("mouseout", function (e) {
     trackLine('stop');
+    document.getElementById('cursor').className = 'hidden';
   }, false);
+  canvas.addEventListener("mouseenter", function (e) {
+    document.getElementById('cursor').className = '';
+  }, false);
+
+  document.addEventListener('mousemove', function (e) {
+    document.getElementById('cursor').style.left = e.pageX - (line_width / 2) + "px";
+    document.getElementById('cursor').style.top = e.pageY - (line_width / 2) + "px";
+  });
 }
 
 /*******************************************************************************
@@ -210,6 +219,10 @@ function updateLineWidth() {
   preview.style.height = line_width + "px";
   preview.style.marginLeft = (50 - (line_width / 2)) + "px";
   preview.style.marginTop = (25 - (line_width / 2)) + "px";
+
+  var cursor = document.getElementById('cursor');
+  cursor.style.width = line_width + "px";
+  cursor.style.height = line_width + "px";
 }
 
 function updateLineColor(color) {

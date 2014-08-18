@@ -8,6 +8,8 @@
 }
 body { font-family: 'Helvetica Neue', 'Arial', sans-serif; }
 canvas { border: 2px solid black; cursor: default; }
+canvas.active { cursor: none; }
+.hidden { display: none; }
 
 #draw_controls { width: 690px; height: 50px; border: 2px solid #000;
   padding-left: 10px; font-weight: bold; }
@@ -25,3 +27,5 @@ canvas { border: 2px solid black; cursor: default; }
 .color { width: 24px; height: 50%; float: left; }
 
 #draw_area { clear: both; margin-top: 10px; }
+#cursor { position: absolute; border-radius: 50%; border: 2px solid #ccc;
+  pointer-events: none; width: 2px; height: 2px; left: -999px; top: -999px; }
