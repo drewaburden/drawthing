@@ -178,8 +178,8 @@ function trackLine(evt, point) {
     return;
   }
   else if (evt == 'start') {
-    x2 = point[0] - canvas.offsetLeft;
-    y2 = point[1] - canvas.offsetTop;
+    x2 = point[0] - canvas.offsetLeft + window.pageXOffset;
+    y2 = point[1] - canvas.offsetTop + window.pageYOffset;
     x1 = x2;
     y1 = y2;
     ctx.strokeStyle = draw_color;
@@ -202,8 +202,8 @@ function trackLine(evt, point) {
   else if (evt == 'move' && currently_drawing) {
     x1 = x2;
     y1 = y2;
-    x2 = point[0] - canvas.offsetLeft;
-    y2 = point[1] - canvas.offsetTop;
+    x2 = point[0] - canvas.offsetLeft + window.pageXOffset;
+    y2 = point[1] - canvas.offsetTop + window.pageYOffset;
     points.push([x2, y2]);
     drawLine();
   }
