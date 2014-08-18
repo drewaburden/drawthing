@@ -53,7 +53,7 @@ app.use(function(req, res){
 * PUBLIC
 */
 io.on('connection', function (socket) {
-  log('INFO: ' + socket.handshake.address.address + ' connected');
+  log('INFO: ' + socket.request.connection.remoteAddress + ' connected');
   socket.join('login');
   socket.on('req', function (data) {
     if (data[0] != EVENTS.DRAW_LINE) {
