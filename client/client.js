@@ -105,18 +105,16 @@ function init() {
 * draws a line received from the server onto canvas
 */
 function drawReceivedLine(data) {
-  canvas2 = document.getElementById('canvas_copy');
-  ctx2 = canvas2.getContext("2d");
-  ctx2.lineCap = 'round';
-  ctx2.strokeStyle = draw_color;
-  ctx2.lineWidth = line_width;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = draw_color;
+  ctx.lineWidth = line_width;
 
   for (var i = 0; i < data.length - 1; i++) {
-    ctx2.beginPath();
-    ctx2.moveTo(data[i][0], data[i][1]);
-    ctx2.lineTo(data[i+1][0], data[i+1][1]);
-    ctx2.stroke();
-    ctx2.closePath();
+    ctx.beginPath();
+    ctx.moveTo(data[i][0], data[i][1]);
+    ctx.lineTo(data[i+1][0], data[i+1][1]);
+    ctx.stroke();
+    ctx.closePath();
   }
   
 }

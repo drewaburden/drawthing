@@ -61,8 +61,8 @@ io.on('connection', function (socket) {
     }
     switch (data[0]) {
       case EVENTS.DRAW_LINE:
-        //socket.broadcast.emit('event', [EVENTS.DRAW_LINE, data[1]]);
-        io.sockets.emit('event', [EVENTS.DRAW_LINE, data[1]]);
+        socket.broadcast.emit('event', [EVENTS.DRAW_LINE, data[1]]);
+        //io.sockets.emit('event', [EVENTS.DRAW_LINE, data[1]]);
         //socket.broadcast.to('game').emit('message', 'nice game');
         break;
       default: break;
