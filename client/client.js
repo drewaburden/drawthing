@@ -4,6 +4,8 @@ function log(text) {
   console.log(text);
 }
 
+var ctrlKeyDown = false;
+
 var your_turn_to_draw = true;
 var canvas, ctx;
 var currently_drawing = false;
@@ -127,8 +129,12 @@ function init() {
   document.addEventListener("mousewheel", function (e) {
     if (context_menu_showing) {
       e.preventDefault();
-      if (e.wheelDeltaY > 0) updateLineWidth(line_width + 1);
-      else if (e.wheelDeltaY < 0) updateLineWidth(line_width - 1);
+      // If the user is holding the control key, increment/decrement slower
+      var inc_amount = 3;
+      if (ctrlKeyDown) inc_amount = 1;
+
+      if (e.wheelDeltaY > 0) updateLineWidth(line_width + inc_amount);
+      else if (e.wheelDeltaY < 0) updateLineWidth(line_width - inc_amount);
       return false;
     }
     else return true;
@@ -136,6 +142,11 @@ function init() {
   document.addEventListener("keydown", function (e) {
     // Close the context menu if it's open and ESC is pressed
     if (e.which == 27 && context_menu_showing) setContextMenuVisibility(false);
+    
+    else if (e.ctrlKey) ctrlKeyDown = true;
+  });
+  document.addEventListener("keyup", function (e) {
+    if (!e.ctrlKey) ctrlKeyDown = false;
   });
   document.addEventListener('mousemove', function (e) {
     document.getElementById('cursor').style.left = e.pageX - (line_width / 2) + "px";
