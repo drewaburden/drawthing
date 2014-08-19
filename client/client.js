@@ -131,7 +131,6 @@ function init() {
       e.preventDefault();
       // If the user is holding the control key, increment/decrement slower
       var inc_amount = 3;
-      if (ctrlKeyDown) inc_amount = 1;
 
       if (e.wheelDeltaY > 0) updateLineWidth(line_width + inc_amount);
       else if (e.wheelDeltaY < 0) updateLineWidth(line_width - inc_amount);
@@ -272,25 +271,25 @@ function updateLineWidth(width) {
   line_width = Math.min(Math.max(width, min_line_width), max_line_width);
 
   // Update range input values
-  document.getElementById('line_width').value = width;
-  document.getElementById('line_width_context').value = width;
+  document.getElementById('line_width').value = line_width;
+  document.getElementById('line_width_context').value = line_width;
 
   // Update previews
   var preview = document.getElementById('line_preview');
-  preview.style.width = width + "px";
-  preview.style.height = width + "px";
-  preview.style.marginLeft = (50 - (width / 2)) + "px";
-  preview.style.marginTop = (25 - (width / 2)) + "px";
+  preview.style.width = line_width + "px";
+  preview.style.height = line_width + "px";
+  preview.style.marginLeft = (50 - (line_width / 2)) + "px";
+  preview.style.marginTop = (25 - (line_width / 2)) + "px";
   preview = document.getElementById('line_preview_context');
-  preview.style.width = width + "px";
-  preview.style.height = width + "px";
-  preview.style.marginLeft = (50 - (width / 2)) + "px";
-  preview.style.marginTop = (25 - (width / 2)) + "px";
+  preview.style.width = line_width + "px";
+  preview.style.height = line_width + "px";
+  preview.style.marginLeft = (50 - (line_width / 2)) + "px";
+  preview.style.marginTop = (25 - (line_width / 2)) + "px";
 
   // Update cursor
   var cursor = document.getElementById('cursor');
-  cursor.style.width = width + "px";
-  cursor.style.height = width + "px";
+  cursor.style.width = line_width + "px";
+  cursor.style.height = line_width + "px";
 }
 
 function updateLineColor(color) {
