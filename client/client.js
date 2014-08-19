@@ -7,11 +7,15 @@ function log(text) {
 var your_turn_to_draw = true;
 var canvas, ctx;
 var currently_drawing = false;
+var context_menu_showing = false;
 var drawing_timeout_id;
 var drawing_upload_interval = 50; // in ms
 var drawing_simplification_tolerance = 0.75;
 var drawing_highquality = false;
 var simple_click_offset = 0.01;
+var default_line_width = 5;
+var min_line_width = 2;
+var max_line_width = 100;
 
 var x1 = 0;
 var x2 = 0;
@@ -83,7 +87,13 @@ s.on('event', function (data) {
 * initial setup
 */
 function init() {
-  updateLineWidth();
+  // Initialize the line width range inputs
+  updateLineWidth(default_line_width);
+  document.getElementById('line_width').min = min_line_width;
+  document.getElementById('line_width_context').min = min_line_width;
+  document.getElementById('line_width').max = max_line_width;
+  document.getElementById('line_width_context').max = max_line_width;
+
   canvas = document.getElementById('canvas_original');
   ctx = canvas.getContext("2d");
   ctx.lineCap = 'round';
@@ -92,7 +102,11 @@ function init() {
     if (currently_drawing) trackLine('move', [e.clientX, e.clientY])
   }, false);
   canvas.addEventListener("mousedown", function (e) {
-    if (e.button == 0) trackLine('start', [e.clientX, e.clientY])
+    if (e.button == 0) {
+      setContextMenuVisibility(false);
+      document.getElementById('cursor').className = '';
+      trackLine('start', [e.clientX, e.clientY])
+    }
     else trackLine('stop');
   }, false);
   canvas.addEventListener("mouseout", function (e) {
@@ -103,16 +117,46 @@ function init() {
   }, false);
   canvas.addEventListener("contextmenu", function (e) {
     e.preventDefault();
+    setContextMenuVisibility(true, e.pageX, e.pageY);
     return false;
   }, false);
 
   $(document).bind("mouseup mouseleave", function () {
     trackLine('stop');
   });
+  document.addEventListener("mousewheel", function (e) {
+    if (context_menu_showing) {
+      e.preventDefault();
+      if (e.wheelDeltaY > 0) updateLineWidth(line_width + 1);
+      else if (e.wheelDeltaY < 0) updateLineWidth(line_width - 1);
+      return false;
+    }
+    else return true;
+  });
+  document.addEventListener("keydown", function (e) {
+    // Close the context menu if it's open and ESC is pressed
+    if (e.which == 27 && context_menu_showing) setContextMenuVisibility(false);
+  });
   document.addEventListener('mousemove', function (e) {
     document.getElementById('cursor').style.left = e.pageX - (line_width / 2) + "px";
     document.getElementById('cursor').style.top = e.pageY - (line_width / 2) + "px";
   });
+}
+
+/*******************************************************************************
+* Sets the visibility of the context menu. It is placed at the specified
+* coordinates when set to visible.
+*/
+function setContextMenuVisibility(isVisible, x, y) {
+  context_menu_showing = isVisible;
+  if (isVisible) {
+    document.getElementById('context_menu').style.left = x - (line_width / 2) + "px";
+    document.getElementById('context_menu').style.top = y - (line_width / 2) + "px";
+    document.getElementById('context_menu').className = '';
+  }
+  else {
+    document.getElementById('context_menu').className = 'hidden';
+  }
 }
 
 /*******************************************************************************
@@ -210,19 +254,32 @@ function trackLine(evt, point) {
 }
 
 /*******************************************************************************
-* updates draw color or width
+* updates line width, line width previews, and cursor size
 */
-function updateLineWidth() {
-  line_width = document.getElementById('line_width').value;
-  var preview = document.getElementById('line_preview');
-  preview.style.width = line_width + "px";
-  preview.style.height = line_width + "px";
-  preview.style.marginLeft = (50 - (line_width / 2)) + "px";
-  preview.style.marginTop = (25 - (line_width / 2)) + "px";
+function updateLineWidth(width) {    
+  // Clamp the line width
+  line_width = Math.min(Math.max(width, min_line_width), max_line_width);
 
+  // Update range input values
+  document.getElementById('line_width').value = width;
+  document.getElementById('line_width_context').value = width;
+
+  // Update previews
+  var preview = document.getElementById('line_preview');
+  preview.style.width = width + "px";
+  preview.style.height = width + "px";
+  preview.style.marginLeft = (50 - (width / 2)) + "px";
+  preview.style.marginTop = (25 - (width / 2)) + "px";
+  preview = document.getElementById('line_preview_context');
+  preview.style.width = width + "px";
+  preview.style.height = width + "px";
+  preview.style.marginLeft = (50 - (width / 2)) + "px";
+  preview.style.marginTop = (25 - (width / 2)) + "px";
+
+  // Update cursor
   var cursor = document.getElementById('cursor');
-  cursor.style.width = line_width + "px";
-  cursor.style.height = line_width + "px";
+  cursor.style.width = width + "px";
+  cursor.style.height = width + "px";
 }
 
 function updateLineColor(color) {

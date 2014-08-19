@@ -17,8 +17,9 @@ canvas.active { cursor: none; }
 #line_width_container { height: 100%; border-right: 2px solid #000;
   width: 400px; float: left; }
 #line_width_container > * { vertical-align: middle; }
-#line_width { width: 200px; }
-#line_preview_container { width: 102px; height: 100%; overflow: hidden;
+#line_width { width: 50%; }
+
+#line_preview_container { width: 100px; height: 100%; overflow: hidden;
   display: inline-block; }
 #line_preview { background: #000; border-radius: 50%;
   border: 1px solid #ccc; }
@@ -29,3 +30,10 @@ canvas.active { cursor: none; }
 #draw_area { clear: both; margin-top: 10px; }
 #cursor { position: absolute; border-radius: 50%; border: 2px solid #ccc;
   pointer-events: none; width: 2px; height: 2px; left: -999px; top: -999px; }
+
+#context_menu { position: absolute; float: left; padding-left: 10px; font-weight: bold; font-size: 12px; vertical-align: middle; border: 2px solid #ccc; background: #eee;
+  width: 300px; height: 50px; left: -999px; top: -999px; }
+#context_menu > * { vertical-align: middle; }
+#line_width_context { width: 40%; }
+#line_preview_context { background: #000; border-radius: 50%;
+  border: 1px solid #ccc; }

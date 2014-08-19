@@ -17,7 +17,7 @@
 <div id="draw_controls">
 
 <div id="line_width_container">
-Line Width <input type="range" id="line_width" min="2" max="100" value="5" oninput="updateLineWidth()">
+Line Width <input type="range" id="line_width" oninput="updateLineWidth(this.value)">
 <div id="line_preview_container"><div id="line_preview"></div></div>
 </div>
 
@@ -60,6 +60,11 @@ Line Width <input type="range" id="line_width" min="2" max="100" value="5" oninp
 <div id="draw_area">
 <canvas id="canvas_original" class="active" width="700" height="600"></canvas>
 <div id="cursor"></div>
+</div>
+
+<div id="context_menu" class="hidden">
+Line Width <input type="range" id="line_width_context" oninput="updateLineWidth(this.value)">
+<div id="line_preview_container"><div id="line_preview_context"></div></div>
 </div>
 
 </body>
