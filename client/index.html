@@ -14,6 +14,7 @@
 </head>
 <body onload="init()">
 
+<!-- Toolbar -->
 <div id="draw_controls">
 
 <div id="line_width_container">
@@ -56,16 +57,40 @@ Line Width <input type="range" id="line_width" oninput="updateLineWidth(this.val
 </div>
 
 </div>
+<!-- -->
 
+<!-- Canvas -->
 <div id="draw_area">
 <canvas id="canvas_original" class="active" width="700" height="600"></canvas>
 <div id="cursor"></div>
 </div>
+<!-- -->
 
+<!-- Context menu -->
 <div id="context_menu" class="hidden">
 Line Width <input type="range" id="line_width_context" oninput="updateLineWidth(this.value)">
 <div id="line_preview_container"><div id="line_preview_context"></div></div>
 </div>
+<!-- -->
+
+<!-- Overlays -->
+<div id="overlay">
+<div id="overlay_screen"></div>
+<div id="overlay_join" class="overlay_child">
+<h1>Join Game</h1>
+<p>
+<form><input id="name_entry" placeholder="Username"></input><button type="submit" formaction="javascript:join($('#name_entry').val())">Join</button></form><br>
+<small><em>(letters, numbers, and underscores only)</em></small>
+</p>
+<p id="join_error_username" class="error hidden">That username is already in use.</p>
+</div>
+<div id="overlay_lost_connection" class="overlay_child hidden">
+<h1>Lost Connection to Server</h1>
+<p>
+Whoops. Try refreshing?
+</p>
+</div>
+<!-- -->
 
 </body>
 </html>

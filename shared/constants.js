@@ -12,5 +12,6 @@ global.EVENTS = {
   NEW_ROUND: 10,
   GUESS:     11,
   DRAW_LINE: 20,
-  DRAW_FILL: 21
+  DRAW_FILL: 21,
+  NAME_CONFLICT: 60
 }

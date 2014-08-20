@@ -43,6 +43,12 @@ function join(username) {
   $('#overlay_join').addClass('hidden');
 }
 
+function nameConflicted() {
+  $('#overlay_join').removeClass('hidden');
+  $('#join_error_username').removeClass('hidden');
+  $('#overlay').removeClass('hidden');
+}
+
 function quit() {
   s.emit("req", [global.EVENTS.QUIT]);
   $('#overlay_join').removeClass('hidden');
@@ -81,6 +87,7 @@ s.on('event', function (data) {
   }
   switch(data[0]) {
     case global.EVENTS.DRAW_LINE: drawReceivedLine(data[1]); break;
+    case global.EVENTS.NAME_CONFLICT: nameConflicted(); break;
     default: break;
   }
 });

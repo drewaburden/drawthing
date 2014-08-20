@@ -8,6 +8,8 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
+var Player = require(__base + '/server/Player');
+
 // game settings
 var server_port = 8080;
 var intermission_time = 4000; // in ms
@@ -45,7 +47,7 @@ function init() {
 app.use(express.static(__base + '/client'));
 app.use(express.static(__base + '/shared'));
 app.use(function(req, res){
-  res.status(404).send('get out');
+  res.status(404).send("404");
 });
 
 /*******************************************************************************
@@ -60,6 +62,12 @@ io.on('connection', function (socket) {
       log("new request: " + data[0]);
     }
     switch (data[0]) {
+      case EVENTS.JOIN:
+        addPlayer(socket, data[1]);
+        break;
+      case EVENTS.QUIT:
+        removePlayer(socket);
+        break;
       case EVENTS.DRAW_LINE:
         socket.broadcast.emit('event', [EVENTS.DRAW_LINE, data[1]]);
         //io.sockets.emit('event', [EVENTS.DRAW_LINE, data[1]]);
@@ -85,6 +93,7 @@ function addPlayer(socket, name) {
 
   // don't allow any "duplicate" names
   if (name in players) {
+    socket.emit('event', [EVENTS.NAME_CONFLICT]);
     return
   }
 
