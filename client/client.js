@@ -303,4 +303,6 @@ function updateLineColor(color) {
   draw_color = color;
   var preview = document.getElementById('line_preview');
   preview.style.backgroundColor = color;
+  preview = document.getElementById('line_preview_context');
+  preview.style.backgroundColor = color;
 }
