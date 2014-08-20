@@ -1,0 +1,9 @@
+{
+	"name":"drawthing",
+	"version":"0.0.1",
+	"private":"true",
+	"dependencies":{
+		"socket.io":"1.0.6",
+		"express":"4.8.5"
+	}
+}

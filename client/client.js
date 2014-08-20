@@ -76,6 +76,14 @@ s.on('state', function (data) {
   }
 });
 
+s.on('connect', function (data) {
+  // Make sure the join dialog is displaying when we successfully connect
+  $('#overlay_join').removeClass('hidden');
+  $('#overlay').removeClass('hidden');
+  $('#overlay_lost_connection').addClass('hidden');
+  // Make sure the canvas is cleared
+  clearCanvas();
+});
 // Upon unexpectedly losing connection to server
 s.on('disconnect', function (data) {
   quit();
@@ -164,6 +172,20 @@ function init() {
     document.getElementById('cursor').style.left = e.pageX - (line_width / 2) + "px";
     document.getElementById('cursor').style.top = e.pageY - (line_width / 2) + "px";
   });
+}
+
+/*******************************************************************************
+* Clears the local client's canvas. This will NOT clear other players' canvases.
+*/
+function clearCanvas() {
+  // Remove any existing points
+  for (point in points) delete points[point];
+  delete points;
+  // Make sure the canvas is blank
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
 }
 
 /*******************************************************************************
