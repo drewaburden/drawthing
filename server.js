@@ -14,6 +14,9 @@ var Player = require(__base + '/server/Player');
 var server_port = 8080;
 var intermission_time = 4000; // in ms
 
+// stores all the lines that have been drawn by players and their respective line colors and widths
+var canvas_lines = [];
+
 /*******************************************************************************
 * various internals
 */
@@ -24,9 +27,22 @@ var state_switch_time = 0; // in ms
 // because players can leave during the game, they are referenced by id
 var players;
 var socket_lookup;
+var num_ingame = 0; // Number of players currently in-game. Used to check if we need to clear the canvas.
 
-function log(text) {
-  console.log(text);
+/*******************************************************************************
+* log helper function. Takes a log text variable and a log message type of type
+* global.LOGTYPE. If no log type is specified, it is assumed to be global.LOGTYPE.NONE
+* and will execute the default case.
+*/
+function log(text, log_type) {
+  switch (log_type) {
+    case global.LOGTYPE.DEBUG: if (debug) console.log("DEBUG: " + text); break;
+    case global.LOGTYPE.WARNING: console.log("WARNING: " + text); break;
+    case global.LOGTYPE.ERROR: console.log("ERROR: " + text); break;
+    case global.LOGTYPE.STATE: console.log("STATE: " + text); break;
+    case global.LOGTYPE.INFO: console.log("INFO: " + text); break;
+    default: console.log(text);
+  }
 }
 
 /*******************************************************************************
@@ -35,7 +51,7 @@ function log(text) {
 */
 function init() {
   server.listen(server_port);
-  log('STATE: INIT (setting up server)');
+  log('INIT (setting up server)', global.LOGTYPE.STATE);
   players = {};
   socket_lookup = {};
 }
@@ -55,11 +71,11 @@ app.use(function(req, res){
 * PUBLIC
 */
 io.on('connection', function (socket) {
-  log('INFO: ' + socket.request.connection.remoteAddress + ' connected');
+  log(socket.request.connection.remoteAddress + ' connected', global.LOGTYPE.INFO);
   socket.join('login');
   socket.on('req', function (data) {
     if (data[0] != EVENTS.DRAW_LINE) {
-      log("new request: " + data[0]);
+      log("new request: " + data[0], global.LOGTYPE.INFO);
     }
     switch (data[0]) {
       case EVENTS.JOIN:
@@ -69,6 +85,7 @@ io.on('connection', function (socket) {
         removePlayer(socket);
         break;
       case EVENTS.DRAW_LINE:
+        canvas_lines.push(data[1]);
         socket.broadcast.emit('event', [EVENTS.DRAW_LINE, data[1]]);
         //io.sockets.emit('event', [EVENTS.DRAW_LINE, data[1]]);
         //socket.broadcast.to('game').emit('message', 'nice game');
@@ -98,18 +115,22 @@ function addPlayer(socket, name) {
   }
 
   var ip = socket.handshake.address.address;
-  if (debug) {
-    log('  ' + ip + ' joined as ' + name);
-  }
+  log(ip + ' joined as ' + name, global.LOGTYPE.DEBUG);
 
   // add player to list
   io.to('game').emit('event', [EVENTS.JOIN, [name, 0]]);
   players[name] = new Player(ip, name, 0, [], socket.id);
   socket_lookup[socket.id] = name;
+  num_ingame++;
 
   // send full client list to joining player
   for (p in players) {
     socket.emit('event', [EVENTS.JOIN, [p, players[p].score]]);
+  }
+
+  // Send the player the current canvas points
+  for (line in canvas_lines) {
+    socket.emit('event', [EVENTS.DRAW_LINE, canvas_lines[line]]);
   }
 
   // add user to the game room
@@ -117,18 +138,6 @@ function addPlayer(socket, name) {
   socket.join('game');
   return true;
 }
-
-/*******************************************************************************
-* handles an updated RoundManager state
-*/
-/*function handleNewRoundState() {
-  switch (RoundMgr.getState()) {
-    case STATES.LOBBY: setTimeout(handleLobby, state_switch_time); break;
-    case STATES.PLAYING_RESET: setTimeout(startRound, state_switch_time); break;
-    case STATES.JUDGING: setTimeout(handleJudging, state_switch_time); break;
-    default: break;
-  }
-}*/
 
 /*******************************************************************************
 * removes a client from the game
@@ -139,12 +148,26 @@ function removePlayer(socket) {
   if (id == undefined) {
     return;
   }
-  if (debug) {
-    log('  player ' + id + ' removed');
-  }
+  log('player ' + id + ' removed', global.LOGTYPE.DEBUG);
   delete players[id];
   delete socket_lookup[socket.id];
+  num_ingame--;
   io.to('game').emit('event', [EVENTS.QUIT, id]);
+
+  // If there's no players left connected, clear the canvas.
+  if ((!players || num_ingame == 0) && canvas_lines) {
+    log('no players left.', global.LOGTYPE.INFO)
+    clearCanvas();
+  }
+}
+
+/*******************************************************************************
+* clears the server's internal canvas data
+*/
+function clearCanvas() {
+  log('clearing canvas.', global.LOGTYPE.INFO)
+  for (line in canvas_lines) delete canvas_lines[line];
+  delete canvas_lines;
 }
 
 /*******************************************************************************

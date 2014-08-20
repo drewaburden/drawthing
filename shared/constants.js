@@ -15,3 +15,12 @@ global.EVENTS = {
   DRAW_FILL: 21,
   NAME_CONFLICT: 60
 }
+
+global.LOGTYPE = {
+  NONE: 0,
+  DEBUG: 1,
+  WARNING: 2,
+  ERROR: 3,
+  STATE: 4,
+  INFO: 5
+}

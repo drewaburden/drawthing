@@ -6,6 +6,7 @@ function log(text) {
 
 var ctrlKeyDown = false;
 
+var ingame = false;
 var your_turn_to_draw = true;
 var canvas, ctx;
 var currently_drawing = false;
@@ -41,6 +42,7 @@ function join(username) {
   s.emit("req", [global.EVENTS.JOIN, username]);
   $('#overlay').addClass('hidden');
   $('#overlay_join').addClass('hidden');
+  ingame = true;
 }
 
 function nameConflicted() {
@@ -53,6 +55,7 @@ function quit() {
   s.emit("req", [global.EVENTS.QUIT]);
   $('#overlay_join').removeClass('hidden');
   $('#overlay').removeClass('hidden');
+  ingame = false;
 }
 
 /*******************************************************************************
@@ -73,9 +76,12 @@ s.on('state', function (data) {
   }
 });
 
+// Upon unexpectedly losing connection to server
 s.on('disconnect', function (data) {
   quit();
-  //alert('Lost connection to server :(');
+  $('#overlay_join').addClass('hidden');
+  $('#overlay').removeClass('hidden');
+  $('#overlay_lost_connection').removeClass('hidden');
 });
 
 /*******************************************************************************
@@ -86,7 +92,7 @@ s.on('event', function (data) {
     log('player event: ' + data);
   }
   switch(data[0]) {
-    case global.EVENTS.DRAW_LINE: drawReceivedLine(data[1]); break;
+    case global.EVENTS.DRAW_LINE: if (ingame) drawReceivedLine(data[1]); break;
     case global.EVENTS.NAME_CONFLICT: nameConflicted(); break;
     default: break;
   }
